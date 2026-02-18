@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { 
   Search, 
   MapPin, 
@@ -14,7 +14,10 @@ import {
   ArrowLeft,
   X,
   Send,
-  User
+  User,
+  LayoutGrid,
+  Home,
+  Navigation
 } from 'lucide-react';
 import { BUSINESSES, EVENTS } from './data';
 import { Business, CategoryType, Screen, CityEvent } from './types';
@@ -22,32 +25,25 @@ import { getCityGuideResponse } from './geminiService';
 
 // --- Components ---
 
-const Header: React.FC<{ onOpenAI: () => void }> = ({ onOpenAI }) => (
-  <header className="bg-white pt-8 pb-4 sticky top-0 z-20 shadow-sm w-full">
-    <div className="flex justify-between items-center mb-6 px-[10px]">
-      <div>
-        <h1 className="text-2xl font-extrabold text-indigo-900 leading-none">Gebzem</h1>
-        <p className="text-sm text-slate-500 font-medium mt-1">Hoş geldin, Gebzeli! 👋</p>
+const Header: React.FC<{ onOpenAI: () => void; searchRef: React.RefObject<HTMLInputElement | null> }> = ({ onOpenAI, searchRef }) => (
+  <header className="bg-white pt-8 pb-4 sticky top-0 z-20 shadow-sm w-full px-[10px]">
+    <div className="flex justify-between items-center">
+      <div className="flex items-center gap-3">
+        <button className="text-indigo-600 p-1">
+          <Navigation size={24} />
+        </button>
+        <div className="flex flex-col">
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none">Teslimat Adresi</span>
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-bold text-slate-800">Gaziler Mah. 1711 Sokak</span>
+          </div>
+        </div>
       </div>
       <div className="flex items-center gap-3">
-        <button 
-          onClick={onOpenAI}
-          className="bg-indigo-50 p-2.5 rounded-full text-indigo-600 hover:bg-indigo-100 transition-colors border border-indigo-100"
-        >
-          <Sparkles size={20} />
-        </button>
         <button className="bg-slate-100 p-2.5 rounded-full text-slate-600">
           <User size={20} />
         </button>
       </div>
-    </div>
-    <div className="relative group px-[10px]">
-      <Search className="absolute left-[24px] top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
-      <input 
-        type="text" 
-        placeholder="Nereye gitmek istersin?" 
-        className="w-full bg-slate-100 py-3.5 pl-12 pr-4 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all border border-transparent focus:border-indigo-100"
-      />
     </div>
   </header>
 );
@@ -112,21 +108,10 @@ const BusinessCard: React.FC<{ business: Business; onClick: () => void }> = ({ b
 );
 
 const EventCard: React.FC<{ event: CityEvent }> = ({ event }) => (
-  <div className="bg-indigo-900 rounded-3xl overflow-hidden shadow-lg relative min-w-[300px] h-44">
-    <img src={event.image} alt={event.title} className="w-full h-full object-cover opacity-50" />
-    <div className="absolute inset-0 p-5 flex flex-col justify-end">
-      <span className="text-indigo-300 text-[10px] font-bold uppercase mb-1">{event.category}</span>
-      <h3 className="text-white font-bold text-lg leading-tight mb-2">{event.title}</h3>
-      <div className="flex items-center gap-3 text-white/80 text-xs">
-        <div className="flex items-center gap-1">
-          <Calendar size={12} />
-          <span>{event.date}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <MapPin size={12} />
-          <span>{event.location}</span>
-        </div>
-      </div>
+  <div className="bg-slate-100 rounded-3xl overflow-hidden shadow-sm relative min-w-[300px] h-[226px]">
+    <div className="absolute inset-0 p-6 flex flex-col justify-end">
+      <span className="text-indigo-600 text-[10px] font-bold uppercase mb-1">{event.category}</span>
+      <h3 className="text-slate-800 font-bold text-xl leading-tight mb-2">{event.title}</h3>
     </div>
   </div>
 );
@@ -141,6 +126,8 @@ export const App: React.FC = () => {
   const [aiChat, setAIChat] = useState<{ role: 'user' | 'bot'; text: string }[]>([]);
   const [aiInput, setAIInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const filteredBusinesses = useMemo(() => {
     if (!selectedCategory) return BUSINESSES;
@@ -169,12 +156,17 @@ export const App: React.FC = () => {
     setIsTyping(false);
   };
 
+  const handleSearchClick = () => {
+    setCurrentScreen('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const renderScreen = () => {
     switch (currentScreen) {
       case 'home':
         return (
           <div className="pb-32 w-full max-w-full">
-            <Header onOpenAI={() => setShowAI(true)} />
+            <Header searchRef={searchInputRef} onOpenAI={() => setShowAI(true)} />
             
             <section className="mt-6 mb-8 overflow-x-auto scrollbar-hide flex gap-4 px-[10px] no-scrollbar w-full">
               {EVENTS.map(event => (
@@ -209,7 +201,7 @@ export const App: React.FC = () => {
               <button onClick={() => setCurrentScreen('home')} className="p-2 hover:bg-slate-100 rounded-full">
                 <ArrowLeft size={24} />
               </button>
-              <h1 className="text-xl font-bold text-slate-800">{selectedCategory}</h1>
+              <h1 className="text-xl font-bold text-slate-800">{selectedCategory || 'Kategoriler'}</h1>
             </div>
             <div className="space-y-2 pt-4 w-full">
               {filteredBusinesses.map(business => (
@@ -303,7 +295,7 @@ export const App: React.FC = () => {
 
       {/* AI Chat Modal - Full Screen */}
       {showAI && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-white animate-in slide-in-from-bottom duration-300 w-full">
+        <div className="fixed inset-0 z-[60] flex flex-col bg-white animate-in slide-in-from-bottom duration-300 w-full">
           <div className="bg-indigo-600 p-6 flex justify-between items-center text-white w-full">
             <div className="flex items-center gap-3 px-[10px]">
               <div className="bg-white/20 p-2 rounded-xl">
@@ -333,7 +325,7 @@ export const App: React.FC = () => {
             )}
             {aiChat.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} w-full`}>
-                <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm ${
+                <div className={`max-w-[85%] p-4 rounded-2xl text-[16px] leading-relaxed shadow-sm ${
                   msg.role === 'user' 
                   ? 'bg-indigo-600 text-white rounded-tr-none' 
                   : 'bg-white text-slate-700 rounded-tl-none border border-slate-100'
@@ -360,7 +352,7 @@ export const App: React.FC = () => {
                 onChange={(e) => setAIInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendAI()}
                 placeholder="Mesajını yaz..."
-                className="flex-1 bg-slate-100 py-3.5 px-6 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="flex-1 bg-slate-100 py-3.5 px-6 rounded-2xl text-[16px] focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
               <button 
                 onClick={handleSendAI}
@@ -373,31 +365,44 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Bottom Nav Bar - Full Width, 15px top radius, no blur, no icon fill, fixed colors */}
-      <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100 py-3 px-[10px] flex justify-between items-center z-50 rounded-t-[15px] shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+      {/* Bottom Nav Bar - Height: 70px, Spacing: 35px, Radius: 15px */}
+      <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100 flex justify-center gap-x-[35px] items-center z-50 h-[70px] shadow-[0_-4px_10px_rgba(0,0,0,0.03)] pb-2 rounded-t-[15px]">
         <button 
           onClick={() => setCurrentScreen('home')} 
-          className={`flex flex-col items-center gap-1 transition-colors ${currentScreen === 'home' ? 'text-indigo-600' : 'text-zinc-800'}`}
+          className={`flex flex-col items-center gap-[1px] transition-colors ${currentScreen === 'home' ? 'text-black' : 'text-zinc-500'}`}
         >
-          <MapPin size={24} />
-          <span className="text-[10px] font-bold">Keşfet</span>
+          <Home size={26} />
+          <span className="text-[10px] font-bold">Anasayfa</span>
         </button>
-        <button className="flex flex-col items-center gap-1 text-zinc-800">
-          <Calendar size={24} />
-          <span className="text-[10px] font-bold">Etkinlik</span>
-        </button>
+        
         <button 
-          onClick={() => setShowAI(true)}
-          className="flex flex-col items-center -mt-8 bg-indigo-600 text-white p-4 rounded-3xl shadow-lg shadow-indigo-200 border-4 border-white transform active:scale-95 transition-transform"
+          onClick={handleSearchClick}
+          className={`flex flex-col items-center gap-[1px] transition-colors ${currentScreen === 'home' && searchInputRef.current === document.activeElement ? 'text-black' : 'text-zinc-500'}`}
         >
-          <Sparkles size={24} />
+          <Search size={26} />
+          <span className="text-[10px] font-bold">Arama</span>
         </button>
-        <button className="flex flex-col items-center gap-1 text-zinc-800">
-          <Utensils size={24} />
-          <span className="text-[10px] font-bold">Menü</span>
+
+        {/* Center AI Button - Distributed Color Gradient, Subtle Animation */}
+        <div className="relative -top-[25px]">
+          <button 
+            onClick={() => setShowAI(true)}
+            className="w-[50px] h-[50px] bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 rounded-full flex items-center justify-center shadow-lg shadow-purple-200 active:scale-90 transition-transform"
+          >
+            <Sparkles size={24} className="text-white animate-pulse" />
+          </button>
+        </div>
+
+        <button 
+          onClick={() => setCurrentScreen('category')}
+          className={`flex flex-col items-center gap-[1px] transition-colors ${currentScreen === 'category' ? 'text-black' : 'text-zinc-500'}`}
+        >
+          <LayoutGrid size={26} />
+          <span className="text-[10px] font-bold">Kategori</span>
         </button>
-        <button className="flex flex-col items-center gap-1 text-zinc-800">
-          <User size={24} />
+
+        <button className="flex flex-col items-center gap-[1px] text-zinc-500">
+          <User size={26} />
           <span className="text-[10px] font-bold">Profil</span>
         </button>
       </nav>
