@@ -80,7 +80,7 @@ const CategoryGrid: React.FC<{ onCategorySelect: (c: CategoryType) => void }> = 
 };
 
 const BusinessCard: React.FC<{ business: Business; onClick: () => void }> = ({ business, onClick }) => (
-  <div className="px-[10px]">
+  <div className="px-[10px] mb-4">
     <div 
       onClick={onClick}
       className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group w-full"
@@ -190,7 +190,7 @@ export const App: React.FC = () => {
                 <h2 className="text-xl font-bold text-slate-800">Senin İçin Seçtiklerimiz</h2>
                 <button className="text-indigo-600 text-sm font-semibold">Tümünü Gör</button>
               </div>
-              <div className="space-y-4">
+              <div className="w-full">
                 {BUSINESSES.filter(b => b.isPromoted).map(business => (
                   <BusinessCard 
                     key={business.id} 
@@ -206,13 +206,13 @@ export const App: React.FC = () => {
       case 'category':
         return (
           <div className="pb-32 w-full">
-            <div className="bg-white flex items-center gap-4 sticky top-0 z-10 shadow-sm py-4 w-full">
-              <button onClick={() => setCurrentScreen('home')} className="p-2 hover:bg-slate-100 rounded-full ml-[10px]">
+            <div className="bg-white flex items-center gap-4 sticky top-0 z-10 shadow-sm py-4 w-full px-[10px]">
+              <button onClick={() => setCurrentScreen('home')} className="p-2 hover:bg-slate-100 rounded-full">
                 <ArrowLeft size={24} />
               </button>
               <h1 className="text-xl font-bold text-slate-800">{selectedCategory}</h1>
             </div>
-            <div className="space-y-6 pt-4 w-full">
+            <div className="space-y-2 pt-4 w-full">
               {filteredBusinesses.map(business => (
                 <BusinessCard 
                   key={business.id} 
@@ -271,7 +271,7 @@ export const App: React.FC = () => {
                 {selectedBusiness.description}
               </p>
 
-              <div className="space-y-4 px-[10px]">
+              <div className="space-y-4 px-[10px] mb-20">
                 <h3 className="font-bold text-lg text-slate-800">Konum</h3>
                 <div className="bg-slate-100 rounded-3xl p-4 flex items-center gap-4">
                   <div className="bg-white p-3 rounded-2xl text-indigo-600 shadow-sm">
@@ -354,7 +354,7 @@ export const App: React.FC = () => {
             )}
           </div>
 
-          <div className="p-[10px] bg-white border-t border-slate-100 pb-8 w-full">
+          <div className="p-[10px] bg-white border-t border-slate-100 pb-12 w-full">
             <div className="relative flex items-center gap-2">
               <input 
                 value={aiInput}

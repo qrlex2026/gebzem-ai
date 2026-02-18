@@ -1,13 +1,11 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const API_KEY = process.env.API_KEY || '';
-
 export const getCityGuideResponse = async (userPrompt: string) => {
-  if (!API_KEY) return "AI servisi şu an kullanılamıyor (API Key eksik).";
+  if (!process.env.API_KEY) return "AI servisi şu an kullanılamıyor (API Key eksik).";
 
   try {
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: userPrompt,
