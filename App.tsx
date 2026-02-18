@@ -17,36 +17,110 @@ import {
   User,
   LayoutGrid,
   Home,
-  Navigation
+  Navigation,
+  Bell,
+  Compass,
+  TrendingUp,
+  TrendingDown,
+  Sun,
+  Cloud,
+  CloudRain,
+  Coins,
+  Gift
 } from 'lucide-react';
 import { BUSINESSES, EVENTS } from './data';
 import { Business, CategoryType, Screen, CityEvent } from './types';
 import { getCityGuideResponse } from './geminiService';
 
+// --- Data ---
+const GEBZE_PLACES = [
+  { id: 'p1', name: 'Eskihisar Kalesi', image: 'https://images.unsplash.com/photo-1590732314545-c49c71607f9c?auto=format&fit=crop&w=400&q=80' },
+  { id: 'p2', name: 'Ballıkayalar Tabiat Parkı', image: 'https://images.unsplash.com/photo-1542332213-9b5a5a3fad35?auto=format&fit=crop&w=400&q=80' },
+  { id: 'p3', name: 'Osman Hamdi Bey Müzesi', image: 'https://images.unsplash.com/photo-1566121315132-d3b5e43c1331?auto=format&fit=crop&w=400&q=80' },
+  { id: 'p4', name: 'Çoban Mustafa Paşa Külliyesi', image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80' }
+];
+
 // --- Components ---
 
-const Header: React.FC<{ onOpenAI: () => void; searchRef: React.RefObject<HTMLInputElement | null> }> = ({ onOpenAI, searchRef }) => (
-  <header className="bg-white pt-8 pb-4 sticky top-0 z-20 shadow-sm w-full px-[10px]">
-    <div className="flex justify-between items-center">
-      <div className="flex items-center gap-3">
-        <button className="text-indigo-600 p-1">
-          <Navigation size={24} />
-        </button>
-        <div className="flex flex-col">
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none">Teslimat Adresi</span>
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-bold text-slate-800">Gaziler Mah. 1711 Sokak</span>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center gap-3">
-        <button className="bg-slate-100 p-2.5 rounded-full text-slate-600">
-          <User size={20} />
-        </button>
-      </div>
+const Header: React.FC = () => (
+  <header className="h-[60px] w-full bg-white border-b border-slate-50 flex items-center justify-between px-[10px] sticky top-0 z-50">
+    <div className="flex items-center gap-2">
+      <Navigation size={20} className="text-indigo-600 rotate-[45deg]" />
+      <span className="text-sm font-bold text-slate-800">Gaziler Mah. 1711 Sok.</span>
+    </div>
+    <div className="relative">
+      <Bell size={28} className="text-slate-600" />
+      <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
     </div>
   </header>
 );
+
+const FinanceWeatherWidget: React.FC = () => {
+  const financeData = [
+    { label: 'USD', value: '34.25', change: '+0.12', trend: 'up' },
+    { label: 'EUR', value: '37.10', change: '-0.05', trend: 'down' },
+    { label: 'GBP', value: '44.52', change: '+0.08', trend: 'up' },
+    { label: 'ALTN', value: '2.952', change: '+1.20', trend: 'up' },
+  ];
+
+  const weatherData = [
+    { day: 'Pzt', temp: '18°', icon: <Sun className="text-orange-400" size={18} /> },
+    { day: 'Sal', temp: '16°', icon: <Cloud className="text-slate-400" size={18} /> },
+    { day: 'Çrş', temp: '14°', icon: <CloudRain className="text-blue-400" size={18} /> },
+    { day: 'Prş', temp: '15°', icon: <Cloud className="text-slate-400" size={18} /> },
+    { day: 'Cum', temp: '19°', icon: <Sun className="text-orange-400" size={18} /> },
+  ];
+
+  return (
+    <div className="px-[10px] mb-8">
+      <div className="flex gap-3 h-[180px]">
+        {/* Finance Section (2/5) */}
+        <div className="flex-[2] bg-slate-900 rounded-[30px] p-4 flex flex-col justify-between shadow-xl shadow-slate-200">
+          <div className="flex items-center gap-2 mb-2">
+            <Coins size={16} className="text-indigo-400" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Piyasalar</span>
+          </div>
+          <div className="space-y-2">
+            {financeData.map((item) => (
+              <div key={item.label} className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-white">{item.label}</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] font-medium text-slate-300">{item.value}</span>
+                  {item.trend === 'up' ? 
+                    <TrendingUp size={10} className="text-emerald-400" /> : 
+                    <TrendingDown size={10} className="text-rose-400" />
+                  }
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Weather Section (3/5) */}
+        <div className="flex-[3] bg-indigo-50 rounded-[30px] p-4 flex flex-col justify-between border border-indigo-100">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <MapPin size={16} className="text-indigo-600" />
+              <span className="text-[10px] font-bold text-indigo-900 uppercase tracking-widest">Gebze Hava</span>
+            </div>
+            <span className="text-[11px] font-bold text-indigo-600">Bugün 18°</span>
+          </div>
+          <div className="flex justify-between items-end">
+            {weatherData.map((w, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <span className="text-[10px] font-bold text-slate-500">{w.day}</span>
+                <div className="bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-sm">
+                  {w.icon}
+                </div>
+                <span className="text-[11px] font-extrabold text-slate-800">{w.temp}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const CategoryGrid: React.FC<{ onCategorySelect: (c: CategoryType) => void }> = ({ onCategorySelect }) => {
   const categories = [
@@ -165,32 +239,34 @@ export const App: React.FC = () => {
     switch (currentScreen) {
       case 'home':
         return (
-          <div className="pb-32 w-full max-w-full">
-            <Header searchRef={searchInputRef} onOpenAI={() => setShowAI(true)} />
-            
-            <section className="mt-6 mb-8 overflow-x-auto scrollbar-hide flex gap-4 px-[10px] no-scrollbar w-full">
+          <div className="pb-32 w-full max-w-full pt-6">
+            {/* Events Slider */}
+            <section className="mt-2 mb-6 overflow-x-auto scrollbar-hide flex gap-4 px-[10px] no-scrollbar w-full">
               {EVENTS.map(event => (
                 <EventCard key={event.id} event={event} />
               ))}
             </section>
-
-            <CategoryGrid onCategorySelect={handleCategoryClick} />
-
-            <section className="w-full">
-              <div className="flex justify-between items-end mb-4 px-[10px]">
-                <h2 className="text-xl font-bold text-slate-800">Senin İçin Seçtiklerimiz</h2>
-                <button className="text-indigo-600 text-sm font-semibold">Tümünü Gör</button>
-              </div>
-              <div className="w-full">
-                {BUSINESSES.filter(b => b.isPromoted).map(business => (
-                  <BusinessCard 
-                    key={business.id} 
-                    business={business} 
-                    onClick={() => handleBusinessClick(business)} 
-                  />
+            
+            {/* GEBZE'DE GEZİLECEK YERLER SECTION */}
+            <div className="mb-8">
+              <h3 className="px-[10px] font-bold text-slate-800 text-lg mb-3 flex items-center gap-2">
+                <MapPin size={20} className="text-indigo-600" />
+                Gebze'de Gezilecek Yerler
+              </h3>
+              <section className="overflow-x-auto scrollbar-hide flex gap-4 px-[10px] no-scrollbar w-full">
+                {GEBZE_PLACES.map(place => (
+                  <div key={place.id} className="min-w-[160px] h-[220px] relative rounded-3xl overflow-hidden shadow-sm flex-shrink-0 bg-slate-50 border border-slate-100">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <span className="text-white font-bold text-sm leading-tight drop-shadow-md">{place.name}</span>
+                    </div>
+                  </div>
                 ))}
-              </div>
-            </section>
+              </section>
+            </div>
+
+            {/* Finance & Weather Widget */}
+            <FinanceWeatherWidget />
           </div>
         );
 
@@ -258,9 +334,9 @@ export const App: React.FC = () => {
                 </div>
               </div>
 
-              <p className="text-slate-600 leading-relaxed mb-8 px-[10px]">
+              <div className="text-slate-600 leading-relaxed mb-8 px-[10px]">
                 {selectedBusiness.description}
-              </p>
+              </div>
 
               <div className="space-y-4 px-[10px] mb-20">
                 <h3 className="font-bold text-lg text-slate-800">Konum</h3>
@@ -365,8 +441,26 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Bottom Nav Bar - Height: 70px, Spacing: 35px, Radius: 15px */}
-      <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100 flex justify-center gap-x-[35px] items-center z-50 h-[70px] shadow-[0_-4px_10px_rgba(0,0,0,0.03)] pb-2 rounded-t-[15px]">
+      {/* Floating Buttons Container */}
+      <div className="fixed bottom-[80px] right-[20px] z-50 flex items-center gap-3">
+        {/* Gift Button */}
+        <button 
+          className="w-[50px] h-[50px] bg-white rounded-full flex items-center justify-center shadow-lg border border-slate-100 active:scale-90 transition-transform"
+        >
+          <Gift size={24} className="text-rose-500" />
+        </button>
+
+        {/* AI Button */}
+        <button 
+          onClick={() => setShowAI(true)}
+          className="w-[50px] h-[50px] bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 rounded-full flex items-center justify-center shadow-lg shadow-purple-200 active:scale-90 transition-transform"
+        >
+          <Sparkles size={24} className="text-white animate-pulse" />
+        </button>
+      </div>
+
+      {/* Bottom Nav Bar - Height: 70px, Distribution: justify-between, Spacing: responsive, Radius: 15px */}
+      <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100 flex justify-between items-center z-50 h-[70px] shadow-[0_-4px_10px_rgba(0,0,0,0.03)] pb-2 rounded-t-[15px] px-6">
         <button 
           onClick={() => setCurrentScreen('home')} 
           className={`flex flex-col items-center gap-[1px] transition-colors ${currentScreen === 'home' ? 'text-black' : 'text-zinc-500'}`}
@@ -383,15 +477,12 @@ export const App: React.FC = () => {
           <span className="text-[10px] font-bold">Arama</span>
         </button>
 
-        {/* Center AI Button - Distributed Color Gradient, Subtle Animation */}
-        <div className="relative -top-[25px]">
-          <button 
-            onClick={() => setShowAI(true)}
-            className="w-[50px] h-[50px] bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 rounded-full flex items-center justify-center shadow-lg shadow-purple-200 active:scale-90 transition-transform"
-          >
-            <Sparkles size={24} className="text-white animate-pulse" />
-          </button>
-        </div>
+        <button 
+          className="flex flex-col items-center gap-[1px] text-zinc-500"
+        >
+          <Compass size={26} />
+          <span className="text-[10px] font-bold">Keşfet</span>
+        </button>
 
         <button 
           onClick={() => setCurrentScreen('category')}
