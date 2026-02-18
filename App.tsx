@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { 
   Search, 
@@ -174,7 +173,7 @@ export const App: React.FC = () => {
     switch (currentScreen) {
       case 'home':
         return (
-          <div className="pb-32 w-full">
+          <div className="pb-32 w-full max-w-full">
             <Header onOpenAI={() => setShowAI(true)} />
             
             <section className="mt-6 mb-8 overflow-x-auto scrollbar-hide flex gap-4 px-[10px] no-scrollbar w-full">
@@ -205,7 +204,7 @@ export const App: React.FC = () => {
 
       case 'category':
         return (
-          <div className="pb-32 w-full">
+          <div className="pb-32 w-full max-w-full">
             <div className="bg-white flex items-center gap-4 sticky top-0 z-10 shadow-sm py-4 w-full px-[10px]">
               <button onClick={() => setCurrentScreen('home')} className="p-2 hover:bg-slate-100 rounded-full">
                 <ArrowLeft size={24} />
@@ -230,7 +229,7 @@ export const App: React.FC = () => {
       case 'details':
         if (!selectedBusiness) return null;
         return (
-          <div className="pb-32 animate-in fade-in slide-in-from-bottom-4 duration-300 w-full">
+          <div className="pb-32 animate-in fade-in slide-in-from-bottom-4 duration-300 w-full max-w-full">
             <div className="relative h-72 w-full">
               <img src={selectedBusiness.image} alt={selectedBusiness.name} className="w-full h-full object-cover" />
               <div className="absolute top-6 left-[10px] flex gap-3">
@@ -375,10 +374,10 @@ export const App: React.FC = () => {
       )}
 
       {/* Bottom Nav Bar - Full Width, 15px top radius, no blur, no icon fill, fixed colors */}
-      <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100 py-3 px-[10px] flex justify-between items-center z-50 rounded-t-[15px]">
+      <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100 py-3 px-[10px] flex justify-between items-center z-50 rounded-t-[15px] shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
         <button 
           onClick={() => setCurrentScreen('home')} 
-          className={`flex flex-col items-center gap-1 transition-colors ${currentScreen === 'home' ? 'text-black' : 'text-zinc-800'}`}
+          className={`flex flex-col items-center gap-1 transition-colors ${currentScreen === 'home' ? 'text-indigo-600' : 'text-zinc-800'}`}
         >
           <MapPin size={24} />
           <span className="text-[10px] font-bold">Keşfet</span>
