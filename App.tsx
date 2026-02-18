@@ -26,7 +26,14 @@ import {
   Cloud,
   CloudRain,
   Coins,
-  Gift
+  Gift,
+  Percent,
+  Ticket,
+  Zap,
+  Tag,
+  SquarePlus,
+  Wallet,
+  ParkingCircle
 } from 'lucide-react';
 import { BUSINESSES, EVENTS } from './data';
 import { Business, CategoryType, Screen, CityEvent } from './types';
@@ -43,15 +50,24 @@ const GEBZE_PLACES = [
 // --- Components ---
 
 const Header: React.FC = () => (
-  <header className="h-[60px] w-full bg-white border-b border-slate-50 flex items-center justify-between px-[10px] sticky top-0 z-50">
-    <div className="flex items-center gap-2">
-      <Navigation size={20} className="text-indigo-600 rotate-[45deg]" />
-      <span className="text-sm font-bold text-slate-800">Gaziler Mah. 1711 Sok.</span>
+  <header className="h-[60px] w-full bg-white border-b border-slate-50 flex items-center justify-between px-[16px] sticky top-0 z-50">
+    <div className="flex items-center gap-3">
+      <div className="w-[28px] h-[28px] rounded-full overflow-hidden bg-slate-100 flex-shrink-0">
+        <img 
+          src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?fit=crop&w=100&h=100" 
+          alt="Profil" 
+          className="w-full h-full object-cover" 
+        />
+      </div>
+      <div className="flex flex-col justify-center">
+        <span className="text-[10px] text-slate-500 font-medium leading-none">İyi günler</span>
+        <span className="text-sm font-bold text-slate-900 leading-tight">Ahmet</span>
+      </div>
     </div>
-    <div className="relative">
-      <Bell size={28} className="text-slate-600" />
-      <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
-    </div>
+    <button className="relative p-1">
+      <Bell size={24} className="text-slate-700" />
+      <div className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></div>
+    </button>
   </header>
 );
 
@@ -118,32 +134,6 @@ const FinanceWeatherWidget: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-const CategoryGrid: React.FC<{ onCategorySelect: (c: CategoryType) => void }> = ({ onCategorySelect }) => {
-  const categories = [
-    { type: CategoryType.CAFE, icon: <Coffee />, color: 'bg-orange-100 text-orange-600' },
-    { type: CategoryType.RESTAURANT, icon: <Utensils />, color: 'bg-rose-100 text-rose-600' },
-    { type: CategoryType.SERVICE, icon: <Wrench />, color: 'bg-blue-100 text-blue-600' },
-    { type: CategoryType.EVENT, icon: <Calendar />, color: 'bg-purple-100 text-purple-600' },
-  ];
-
-  return (
-    <div className="grid grid-cols-4 gap-4 px-[10px] mb-8 w-full">
-      {categories.map((cat) => (
-        <button 
-          key={cat.type}
-          onClick={() => onCategorySelect(cat.type)}
-          className="flex flex-col items-center gap-2"
-        >
-          <div className={`${cat.color} p-4 rounded-2xl shadow-sm hover:scale-105 transition-transform duration-200`}>
-            {React.cloneElement(cat.icon as React.ReactElement, { size: 24 })}
-          </div>
-          <span className="text-xs font-semibold text-slate-700">{cat.type}</span>
-        </button>
-      ))}
     </div>
   );
 };
@@ -239,34 +229,85 @@ export const App: React.FC = () => {
     switch (currentScreen) {
       case 'home':
         return (
-          <div className="pb-32 w-full max-w-full pt-6">
-            {/* Events Slider */}
-            <section className="mt-2 mb-6 overflow-x-auto scrollbar-hide flex gap-4 px-[10px] no-scrollbar w-full">
-              {EVENTS.map(event => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </section>
-            
-            {/* GEBZE'DE GEZİLECEK YERLER SECTION */}
-            <div className="mb-8">
-              <h3 className="px-[10px] font-bold text-slate-800 text-lg mb-3 flex items-center gap-2">
-                <MapPin size={20} className="text-indigo-600" />
-                Gebze'de Gezilecek Yerler
-              </h3>
-              <section className="overflow-x-auto scrollbar-hide flex gap-4 px-[10px] no-scrollbar w-full">
-                {GEBZE_PLACES.map(place => (
-                  <div key={place.id} className="min-w-[160px] h-[220px] relative rounded-3xl overflow-hidden shadow-sm flex-shrink-0 bg-slate-50 border border-slate-100">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <span className="text-white font-bold text-sm leading-tight drop-shadow-md">{place.name}</span>
-                    </div>
-                  </div>
+          <div className="pb-32 w-full max-w-full">
+            <Header />
+            <div className="pt-4">
+              {/* Events Slider */}
+              <section className="mb-6 overflow-x-auto scrollbar-hide flex gap-4 px-[10px] no-scrollbar w-full">
+                {EVENTS.map(event => (
+                  <EventCard key={event.id} event={event} />
                 ))}
               </section>
-            </div>
 
-            {/* Finance & Weather Widget */}
-            <FinanceWeatherWidget />
+              {/* Promo Cards Row */}
+              <section className="mb-4 overflow-x-auto scrollbar-hide flex gap-3 px-[10px] no-scrollbar w-full">
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-rose-50 flex flex-col items-center justify-center border border-rose-100 flex-shrink-0">
+                  <Percent size={24} className="text-rose-600 mb-1" />
+                  <span className="text-[10px] font-bold text-rose-800">İndirim</span>
+                </div>
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-amber-50 flex flex-col items-center justify-center border border-amber-100 flex-shrink-0">
+                  <Ticket size={24} className="text-amber-600 mb-1" />
+                  <span className="text-[10px] font-bold text-amber-800">Kupon</span>
+                </div>
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-orange-50 flex flex-col items-center justify-center border border-orange-100 flex-shrink-0">
+                  <Zap size={24} className="text-orange-600 mb-1" />
+                  <span className="text-[10px] font-bold text-orange-800">Fırsat</span>
+                </div>
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-blue-50 flex flex-col items-center justify-center border border-blue-100 flex-shrink-0">
+                  <Tag size={24} className="text-blue-600 mb-1" />
+                  <span className="text-[10px] font-bold text-blue-800">Kampanya</span>
+                </div>
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-purple-50 flex flex-col items-center justify-center border border-purple-100 flex-shrink-0">
+                  <Gift size={24} className="text-purple-600 mb-1" />
+                  <span className="text-[10px] font-bold text-purple-800">Hediye</span>
+                </div>
+              </section>
+
+              {/* Service Cards Row */}
+              <section className="mb-8 overflow-x-auto scrollbar-hide flex gap-3 px-[10px] no-scrollbar w-full">
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-slate-50 flex flex-col items-center justify-center border border-slate-200 flex-shrink-0">
+                  <SquarePlus size={24} className="text-slate-700 mb-1" />
+                  <span className="text-[10px] font-bold text-slate-800">Eczane</span>
+                </div>
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-slate-50 flex flex-col items-center justify-center border border-slate-200 flex-shrink-0">
+                  <Wallet size={24} className="text-slate-700 mb-1" />
+                  <span className="text-[10px] font-bold text-slate-800">ATM</span>
+                </div>
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-slate-50 flex flex-col items-center justify-center border border-slate-200 flex-shrink-0">
+                  <Navigation size={24} className="text-slate-700 mb-1" />
+                  <span className="text-[10px] font-bold text-slate-800">Şehir İçi</span>
+                </div>
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-slate-50 flex flex-col items-center justify-center border border-slate-200 flex-shrink-0">
+                  <ParkingCircle size={24} className="text-slate-700 mb-1" />
+                  <span className="text-[10px] font-bold text-slate-800">Otopark</span>
+                </div>
+                <div className="min-w-[80px] h-[80px] rounded-[10px] bg-slate-50 flex flex-col items-center justify-center border border-slate-200 flex-shrink-0">
+                  <Clock size={24} className="text-slate-700 mb-1" />
+                  <span className="text-[10px] font-bold text-slate-800">Nöbetçi</span>
+                </div>
+              </section>
+              
+              {/* GEBZE'DE GEZİLECEK YERLER SECTION */}
+              <div className="mb-8">
+                <h3 className="px-[10px] font-bold text-slate-800 text-lg mb-3 flex items-center gap-2">
+                  <MapPin size={20} className="text-indigo-600" />
+                  Gebze'de Gezilecek Yerler
+                </h3>
+                <section className="overflow-x-auto scrollbar-hide flex gap-4 px-[10px] no-scrollbar w-full">
+                  {GEBZE_PLACES.map(place => (
+                    <div key={place.id} className="min-w-[160px] h-[220px] relative rounded-3xl overflow-hidden shadow-sm flex-shrink-0 bg-slate-50 border border-slate-100">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent" />
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <span className="text-white font-bold text-sm leading-tight drop-shadow-md">{place.name}</span>
+                      </div>
+                    </div>
+                  ))}
+                </section>
+              </div>
+
+              {/* Finance & Weather Widget */}
+              <FinanceWeatherWidget />
+            </div>
           </div>
         );
 
