@@ -1,0 +1,7 @@
+{
+  "name": "Gebzem - Şehir Süper Uygulaması",
+  "description": "Gebze şehri için restoranlar, kafeler, yerel hizmetler ve etkinlikleri bir araya getiren, Gemini AI destekli modern bir süper uygulama.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
